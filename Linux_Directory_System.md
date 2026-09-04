@@ -109,6 +109,7 @@ Topic                                                    Key Difference
 ---
 
 ### Quick Revision
+```
 / → Root of filesystem
 /etc → Configuration
 /var → Variable/changing data
@@ -123,6 +124,7 @@ Topic                                                    Key Difference
 /boot → GRUB + kernel
 /mnt → Manual mount point
 /media → Auto-mounted USB/CD-ROM
+```
 
 ---
 
