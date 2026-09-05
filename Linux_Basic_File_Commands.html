@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux Basic File Commands — ls, cd, mkdir</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:#e7e5dc;
+  color:#20243a;
+  font-family:"Trebuchet MS",Arial,sans-serif;
+  padding:28px 14px;
+}
+.notebook{max-width:920px;margin:auto}
+.page{
+  position:relative;
+  margin:0 auto 28px;
+  padding:48px 48px 52px 88px;
+  background:#fffdf4;
+  border:1px solid rgba(170,165,145,.65);
+  border-radius:5px;
+  box-shadow:0 8px 25px rgba(45,48,60,.13);
+  background-image:repeating-linear-gradient(
+    to bottom,transparent 0,transparent 31px,
+    rgba(80,145,205,.22) 32px,transparent 33px
+  );
+  overflow:hidden;
+}
+.page:before{
+  content:"";position:absolute;left:62px;top:0;bottom:0;width:2px;
+  background:rgba(205,65,65,.34)
+}
+.num{position:absolute;right:22px;top:14px;color:#777;font-size:12px;font-weight:bold}
+h1{
+  font-family:Georgia,serif;color:#234a91;font-size:37px;line-height:1.15;
+  margin-bottom:8px;text-decoration:underline;text-decoration-color:rgba(35,74,145,.2);
+  text-underline-offset:6px
+}
+.subtitle{font-size:14px;color:#6c7080;font-style:italic;margin-bottom:24px}
+h2{
+  font-family:Georgia,serif;color:#234a91;font-size:25px;
+  margin:23px 0 10px;padding-bottom:5px;border-bottom:2px solid rgba(80,145,205,.28)
+}
+h2.red{color:#ad382b;border-bottom-color:rgba(173,56,43,.22)}
+h3{color:#234a91;font-size:19px;margin:18px 0 7px}
+p,li{font-size:15.5px;line-height:1.72}
+ul{padding-left:23px;margin:5px 0 12px}
+li{margin:4px 0}
+strong{font-weight:800}
+.hl{background:#fff09a;padding:1px 4px;border-radius:3px}
+.callout{
+  margin:15px 0;padding:12px 15px;border-left:4px solid #234a91;
+  border-radius:5px;background:rgba(70,140,220,.09)
+}
+.callout.yellow{border-left-color:#aa8700;background:rgba(255,232,50,.18)}
+.callout.green{border-left-color:#2d8a55;background:rgba(50,185,90,.09)}
+.callout.red{border-left-color:#ad382b;background:rgba(173,56,43,.08)}
+.ct{font-weight:800;margin-bottom:3px}
+code{
+  font-family:"Courier New",monospace;
+  background:rgba(35,74,145,.08);padding:1px 4px;border-radius:3px
+}
+.codebox{
+  margin:11px 0;padding:13px 15px;background:#f7f5ec;
+  border:1px solid rgba(110,110,120,.24);border-left:4px solid #234a91;
+  border-radius:5px;overflow-x:auto
+}
+pre{font-family:"Courier New",monospace;font-size:14px;line-height:1.7;white-space:pre}
+.topic{
+  margin:14px 0;padding:13px 15px;border-left:4px solid #234a91;
+  border-radius:5px;background:rgba(70,140,220,.07)
+}
+.topic.orange{border-left-color:#c47720;background:rgba(255,145,40,.08)}
+.topic.yellow{border-left-color:#aa8700;background:rgba(255,232,50,.14)}
+.topic.green{border-left-color:#2d8a55;background:rgba(50,185,90,.08)}
+.topic.purple{border-left-color:#7442b5;background:rgba(130,70,230,.08)}
+.topic-title{font-size:19px;font-weight:800;color:#234a91;margin-bottom:4px}
+.trick{font-size:13px;color:#666a79;font-style:italic;margin-top:6px}
+.compare{width:100%;border-collapse:collapse;margin:13px 0}
+.compare th,.compare td{
+  border:1px solid rgba(120,120,130,.25);padding:9px 10px;
+  text-align:left;vertical-align:top;font-size:14px;line-height:1.55
+}
+.compare th{background:rgba(35,74,145,.1);color:#234a91;font-weight:800}
+.compare tr:nth-child(even) td{background:rgba(70,140,220,.03)}
+.badges{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px}
+.badge{
+  padding:5px 9px;border-radius:12px;background:rgba(70,140,220,.1);
+  border:1px solid rgba(35,74,145,.17);font-size:12.5px;color:#234a91;font-weight:700
+}
+.question{
+  margin:11px 0;padding:12px 14px;background:rgba(255,232,50,.14);
+  border-left:4px solid #aa8700;border-radius:5px
+}
+.question b{display:block;margin-bottom:4px}
+.answer{font-size:14.5px;line-height:1.65}
+.practice{
+  margin-top:14px;padding:14px 16px;background:rgba(50,185,90,.09);
+  border:1.5px dashed rgba(45,138,85,.45);border-radius:6px
+}
+.checklist{list-style:none;padding-left:0}
+.checklist li{margin:7px 0}
+.checklist input{margin-right:8px;transform:scale(1.1)}
+.cheat{
+  padding:15px;border:2px dashed rgba(35,74,145,.32);
+  border-radius:8px;background:rgba(70,140,220,.055)
+}
+.cheat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;margin-top:8px}
+.cheat-item{font-size:14px;padding:7px 0;border-bottom:1px dashed rgba(100,100,110,.23)}
+details{
+  margin:12px 0;border:1px solid rgba(100,100,110,.2);
+  border-radius:6px;background:rgba(255,255,255,.55)
+}
+summary{cursor:pointer;padding:10px 13px;color:#234a91;font-weight:800}
+.inside{padding:0 13px 12px}
+.footer{text-align:center;color:#6c7080;font-size:13px;font-style:italic;margin-top:18px}
+@media(max-width:700px){
+  .page{padding:42px 20px 42px 51px}.page:before{left:34px}
+  h1{font-size:30px}.cheat-grid{grid-template-columns:1fr}
+}
+@media print{
+  body{background:white;padding:0}.page{box-shadow:none;margin-bottom:0;page-break-after:always}
+  .page:last-child{page-break-after:auto}
+}
+</style>
+</head>
+
+<body>
+<div class="notebook">
+
+<section class="page">
+<span class="num">01</span>
+<h1>Linux Basic File Commands</h1>
+<div class="subtitle">Video 2 • Practical Tutorial • Part 1 • Estimated Duration: 10–12 minutes</div>
+
+<div class="badges">
+<span class="badge">ls</span><span class="badge">cd</span><span class="badge">mkdir</span>
+<span class="badge">Practical Linux</span>
+</div>
+
+<div class="callout yellow">
+<div class="ct">📌 Scope of This Lesson</div>
+<strong>Commands covered:</strong> <code>ls</code>, <code>cd</code>, <code>mkdir</code>.<br>
+<strong>Not covered:</strong> <code>cp</code>, <code>mv</code>, <code>rm</code> — these are planned for the next video.
+</div>
+
+<h2>Introduction</h2>
+<p>
+In the previous lesson, we studied the Linux directory structure — including
+<strong>/etc, /var, /home, /tmp, /dev, /proc</strong> and other important directories.
+Now that the filesystem structure is clear, the next step is learning how to work with those directories.
+</p>
+
+<div class="callout">
+<div class="ct">🎯 Today's Goal</div>
+<ul>
+<li><strong><code>ls</code></strong> → list files and directories</li>
+<li><strong><code>cd</code></strong> → move into another directory</li>
+<li><strong><code>mkdir</code></strong> → create new directories</li>
+</ul>
+Everything will be practiced directly in the <strong>terminal</strong>.
+</div>
+
+<h2>Part 1 — Check Your Current Location</h2>
+
+<h3><code>pwd</code> — Print Working Directory</h3>
+<div class="codebox"><pre>pwd</pre></div>
+
+<p>
+Before working with directories, first check where you are.
+<strong><code>pwd</code></strong> means <strong>Print Working Directory</strong>.
+It tells you the current location in the Linux filesystem.
+</p>
+
+<div class="codebox"><pre>/home/shipra</pre></div>
+
+<p>
+If the output is <code>/home/shipra</code>, that means the current directory is
+<strong>/home/shipra</strong>. From this location, we can start learning <code>ls</code>.
+</p>
+
+<div class="callout green">
+<div class="ct">🧠 Quick Revision</div>
+<strong>pwd = Where am I right now?</strong>
+</div>
+</section>
+
+
+<section class="page">
+<span class="num">02</span>
+
+<h2>Part 2 — <code>ls</code> Command</h2>
+
+<h3>1. Basic <code>ls</code></h3>
+<div class="codebox"><pre>ls</pre></div>
+<p>
+<strong><code>ls</code></strong> is used to list the files and directories available inside the
+<strong>current directory</strong>.
+</p>
+
+<div class="codebox"><pre>Desktop
+Documents
+Downloads
+Pictures
+test.txt</pre></div>
+
+<p>
+So, <code>ls</code> basically answers:
+<strong>“What is available inside my current directory?”</strong>
+</p>
+
+<h3>2. <code>ls -l</code> — Long Listing Format</h3>
+<div class="codebox"><pre>ls -l</pre></div>
+
+<p>
+Normal <code>ls</code> mainly shows names. With <strong><code>-l</code></strong>, we get detailed information
+such as <strong>permissions, owner, group, size and modification time</strong>.
+</p>
+
+<div class="codebox"><pre>-rw-r--r-- 1 shipra shipra  1250 Sep  5 10:20 test.txt
+drwxr-xr-x 2 shipra shipra  4096 Sep  5 10:25 Documents</pre></div>
+
+<table class="compare">
+<tr><th>Part</th><th>Meaning</th></tr>
+<tr><td><code>-rw-r--r--</code></td><td><strong>Permissions</strong></td></tr>
+<tr><td><code>shipra</code></td><td><strong>Owner</strong></td></tr>
+<tr><td><code>shipra</code></td><td><strong>Group</strong></td></tr>
+<tr><td><code>1250</code></td><td><strong>Size</strong></td></tr>
+<tr><td><code>Sep 5 10:20</code></td><td><strong>Last modification time</strong></td></tr>
+<tr><td><code>test.txt</code></td><td><strong>File name</strong></td></tr>
+</table>
+
+<div class="callout yellow">
+<div class="ct">⭐ Interview / Exam Important</div>
+Remember <strong><code>ls -l</code> = long listing / detailed information</strong>.
+Permissions will be covered separately, so for now focus on recognizing the fields.
+</div>
+
+<h3>3. <code>ls -a</code> — Show Hidden Files</h3>
+<div class="codebox"><pre>ls -a</pre></div>
+
+<p>
+<strong><code>-a</code></strong> means <strong>all</strong>. It shows hidden files and directories as well.
+In Linux, files and directories beginning with <strong><code>.</code></strong> are normally hidden.
+</p>
+
+<div class="codebox"><pre>.
+..
+.bashrc
+.profile
+.config
+Documents
+Downloads</pre></div>
+
+<p>
+For example, <code>.bashrc</code> may not appear with normal <code>ls</code>, but it appears with
+<code>ls -a</code>.
+</p>
+
+<table class="compare">
+<tr><th>Command</th><th>What it shows</th></tr>
+<tr><td><code>ls</code></td><td>Normal files and directories</td></tr>
+<tr><td><code>ls -a</code></td><td>Normal + hidden files and directories</td></tr>
+</table>
+
+<div class="callout green">
+<div class="ct">🧠 Memory Trick</div>
+<strong>-a = all</strong> → hidden files are included too.
+</div>
+</section>
+
+
+<section class="page">
+<span class="num">03</span>
+
+<h2>More Useful <code>ls</code> Options</h2>
+
+<h3>4. <code>ls -lh</code> — Human-Readable Sizes</h3>
+<div class="codebox"><pre>ls -lh</pre></div>
+
+<p>
+Here, <strong><code>-h</code></strong> means <strong>human-readable</strong>.
+It is commonly used together with <code>-l</code> so that detailed file information is shown
+with easier-to-read file sizes.
+</p>
+
+<table class="compare">
+<tr><th>Command / Output</th><th>Meaning</th></tr>
+<tr><td><code>ls -l</code><br><br><code>1048576</code></td><td>Detailed listing, but the size may be harder to read.</td></tr>
+<tr><td><code>ls -lh</code><br><br><code>1.0M</code></td><td>Detailed listing with a human-readable size.</td></tr>
+</table>
+
+<div class="callout">
+<div class="ct">Remember</div>
+<strong><code>-l</code> → Detailed information</strong><br>
+<strong><code>-h</code> → Human-readable size</strong>
+</div>
+
+<h3>5. <code>ls -lt</code> — Sort by Modification Time</h3>
+<div class="codebox"><pre>ls -lt</pre></div>
+
+<p>
+<strong><code>-t</code></strong> sorts files according to their <strong>modification time</strong>.
+Recently modified files generally appear near the top.
+</p>
+
+<div class="codebox"><pre>file3.txt   Sep 5 10:30
+file2.txt   Sep 5 10:20
+file1.txt   Sep 4 18:00</pre></div>
+
+<div class="callout green">
+<div class="ct">💻 Real-World / DevOps Use</div>
+If a server contains many log files and you want to identify the files modified recently,
+<strong><code>ls -lt</code></strong> can be useful.
+</div>
+
+<h2>⭐ Bonus — Combine Flags</h2>
+
+<p>
+Linux command options can be combined when you need multiple behaviors at the same time.
+</p>
+
+<div class="codebox"><pre>ls -lht</pre></div>
+<table class="compare">
+<tr><th>Flag</th><th>Meaning</th></tr>
+<tr><td><code>-l</code></td><td>Long / detailed listing</td></tr>
+<tr><td><code>-h</code></td><td>Human-readable sizes</td></tr>
+<tr><td><code>-t</code></td><td>Sort by modification time</td></tr>
+</table>
+
+<div class="codebox"><pre>ls -la</pre></div>
+<table class="compare">
+<tr><th>Flag</th><th>Meaning</th></tr>
+<tr><td><code>-l</code></td><td>Detailed listing</td></tr>
+<tr><td><code>-a</code></td><td>Include hidden files</td></tr>
+</table>
+
+<div class="callout yellow">
+<div class="ct">🧠 Quick Flag Memory</div>
+<div class="badges">
+<span class="badge">-l = Long</span>
+<span class="badge">-a = All</span>
+<span class="badge">-h = Human-readable</span>
+<span class="badge">-t = Time sort</span>
+</div>
+</div>
+</section>
+
+
+<section class="page">
+<span class="num">04</span>
+
+<h2>Part 3 — <code>cd</code> Command</h2>
+
+<h3><code>cd</code> — Change Directory</h3>
+<div class="codebox"><pre>cd</pre></div>
+
+<p>
+<strong><code>cd</code></strong> means <strong>Change Directory</strong>.
+It is used to move from the current directory into another directory.
+</p>
+
+<p>First check the current location:</p>
+<div class="codebox"><pre>pwd</pre></div>
+
+<div class="codebox"><pre>/home/shipra</pre></div>
+
+<p>Now move into the <strong>Documents</strong> directory:</p>
+<div class="codebox"><pre>cd Documents
+pwd</pre></div>
+
+<div class="codebox"><pre>/home/shipra/Documents</pre></div>
+
+<p>
+We moved from <strong>/home/shipra</strong> into <strong>/home/shipra/Documents</strong>.
+</p>
+
+<h3><code>cd ..</code> — Move to Parent Directory</h3>
+<div class="codebox"><pre>cd ..</pre></div>
+
+<p>
+<strong><code>..</code></strong> represents the <strong>parent directory</strong>.
+If you are here:
+</p>
+<div class="codebox"><pre>/home/shipra/Documents</pre></div>
+<p>then:</p>
+<div class="codebox"><pre>cd ..</pre></div>
+<p>takes you back to:</p>
+<div class="codebox"><pre>/home/shipra</pre></div>
+
+<div class="callout">
+<div class="ct">🧠 Easy Memory</div>
+<strong><code>.</code> → Current directory</strong><br>
+<strong><code>..</code> → Parent directory</strong>
+</div>
+
+<h3><code>cd /</code> — Go to Root</h3>
+<div class="codebox"><pre>cd /
+pwd</pre></div>
+
+<div class="codebox"><pre>/</pre></div>
+
+<p>
+This takes you directly to the Linux <strong>root directory</strong>, represented by <strong><code>/</code></strong>.
+</p>
+
+<h3><code>cd ~</code> — Go to Home Directory</h3>
+<div class="codebox"><pre>cd ~
+pwd</pre></div>
+
+<p>
+<strong><code>~</code></strong> generally represents the <strong>current user's home directory</strong>.
+For the example user <code>shipra</code>, it represents:
+</p>
+
+<div class="codebox"><pre>/home/shipra</pre></div>
+
+<p>
+So <strong><code>cd ~</code></strong> can be used to return directly to your home directory.
+</p>
+
+<div class="callout green">
+<div class="ct">⭐ Quick Revision</div>
+<strong>cd directory</strong> → enter a directory<br>
+<strong>cd ..</strong> → parent directory<br>
+<strong>cd /</strong> → root directory<br>
+<strong>cd ~</strong> → current user's home directory
+</div>
+</section>
+
+
+<section class="page">
+<span class="num">05</span>
+
+<h2>Part 4 — Absolute Path vs Relative Path ⭐</h2>
+
+<p>
+This is an important concept when using <strong><code>cd</code></strong>.
+The difference is based on <strong>where the path starts from</strong>.
+</p>
+
+<h3>Absolute Path</h3>
+
+<p>Suppose you want to go to:</p>
+<div class="codebox"><pre>/home/shipra/Documents</pre></div>
+
+<p>You can specify the complete path:</p>
+<div class="codebox"><pre>cd /home/shipra/Documents</pre></div>
+
+<p>
+This is an <strong>absolute path</strong>.
+It starts from <strong><code>/</code></strong>, the root of the filesystem, and specifies the complete location.
+</p>
+
+<h3>Relative Path</h3>
+
+<p>Suppose you are already here:</p>
+<div class="codebox"><pre>/home/shipra</pre></div>
+
+<p>and you want to enter <strong>Documents</strong>:</p>
+<div class="codebox"><pre>cd Documents</pre></div>
+
+<p>
+This is a <strong>relative path</strong> because the current directory is used as the starting point.
+</p>
+
+<table class="compare">
+<tr><th>Absolute Path</th><th>Relative Path</th></tr>
+<tr>
+<td><code>cd /home/shipra/Documents</code></td>
+<td><code>cd Documents</code></td>
+</tr>
+<tr>
+<td>Starts from <strong>/</strong> and gives the complete location.</td>
+<td>Starts from the <strong>current directory</strong>.</td>
+</tr>
+<tr>
+<td>Describes a fixed location from the filesystem root.</td>
+<td>Describes a location relative to where you currently are.</td>
+</tr>
+</table>
+
+<div class="callout yellow">
+<div class="ct">⭐ Interview / Exam Important</div>
+<strong>Absolute path = starts from root <code>/</code>.</strong><br>
+<strong>Relative path = starts from the current directory.</strong>
+</div>
+
+<h2>Part 5 — <code>mkdir</code> Command</h2>
+
+<h3><code>mkdir</code> — Make Directory</h3>
+<div class="codebox"><pre>mkdir</pre></div>
+
+<p>
+<strong><code>mkdir</code></strong> means <strong>Make Directory</strong>.
+It is used to create a new directory.
+</p>
+
+<h3>Basic Example</h3>
+<div class="codebox"><pre>mkdir linux-practice
+ls</pre></div>
+
+<p>
+After running the command, <strong>linux-practice</strong> should appear in the listing.
+This means the new directory has been created successfully.
+</p>
+
+<h3>Enter the New Directory</h3>
+<div class="codebox"><pre>cd linux-practice
+pwd</pre></div>
+
+<p>
+Now you are inside the newly created directory.
+</p>
+</section>
+
+
+<section class="page">
+<span class="num">06</span>
+
+<h2><code>mkdir -p</code> — Create Nested Directories</h2>
+
+<p>
+<strong><code>-p</code></strong> is an important option when you want to create a directory structure
+where the parent directories may not already exist.
+</p>
+
+<p>Suppose you want this structure:</p>
+
+<div class="codebox"><pre>project
+└── linux
+    └── commands</pre></div>
+
+<p>
+If the parent directories do not already exist, this may fail:
+</p>
+
+<div class="codebox"><pre>mkdir project/linux/commands</pre></div>
+
+<p>
+In that situation, use:
+</p>
+
+<div class="codebox"><pre>mkdir -p project/linux/commands</pre></div>
+
+<p>
+The <strong><code>-p</code></strong> option creates the required parent directories as needed.
+So the command can create the complete nested structure:
+</p>
+
+<div class="codebox"><pre>project
+   ↓
+linux
+   ↓
+commands</pre></div>
+
+<div class="callout green">
+<div class="ct">🧠 Memory Trick</div>
+<strong><code>mkdir -p</code> = make the path, including missing parents.</strong>
+</div>
+
+<h3>Verify the Structure</h3>
+<div class="codebox"><pre>ls project
+ls project/linux</pre></div>
+
+<div class="callout yellow">
+<div class="ct">⭐ Interview / Exam Important</div>
+<strong><code>mkdir</code></strong> creates a directory.<br>
+<strong><code>mkdir -p</code></strong> creates the required parent directories too, allowing nested directory structures to be created in one command.
+</div>
+
+<h2>🧪 Final Practical — Complete Mini Exercise</h2>
+
+<p>
+Now combine the commands from this lesson into one small practice exercise.
+</p>
+
+<div class="practice">
+<div class="ct">Step 1 — Go to your home directory</div>
+<div class="codebox"><pre>cd ~</pre></div>
+
+<div class="ct">Step 2 — Create the directory structure</div>
+<div class="codebox"><pre>mkdir -p linux-practice/day1</pre></div>
+
+<div class="ct">Step 3 — Enter the new directory</div>
+<div class="codebox"><pre>cd linux-practice/day1</pre></div>
+
+<div class="ct">Step 4 — Check your current location</div>
+<div class="codebox"><pre>pwd</pre></div>
+
+<div class="ct">Step 5 — List the directory</div>
+<div class="codebox"><pre>ls</pre></div>
+
+<div class="ct">Step 6 — Move to the parent directory</div>
+<div class="codebox"><pre>cd ..</pre></div>
+
+<div class="ct">Step 7 — Check your location again</div>
+<div class="codebox"><pre>pwd</pre></div>
+
+<div class="ct">Step 8 — Show hidden files too</div>
+<div class="codebox"><pre>ls -la</pre></div>
+
+<div class="ct">Step 9 — Detailed listing with readable sizes</div>
+<div class="codebox"><pre>ls -lh</pre></div>
+
+<div class="ct">Step 10 — Sort by modification time</div>
+<div class="codebox"><pre>ls -lt</pre></div>
+</div>
+
+<p>
+This mini exercise combines <strong><code>mkdir</code>, <code>cd</code>, <code>pwd</code></strong> and the different
+<strong><code>ls</code></strong> options covered in this lesson.
+</p>
+</section>
+
+
+<section class="page">
+<span class="num">07</span>
+
+<h2>🧠 Quick Revision</h2>
+
+<table class="compare">
+<tr><th>Command</th><th>Meaning / Use</th></tr>
+<tr><td><code>pwd</code></td><td>Print Working Directory → shows your current location</td></tr>
+<tr><td><code>ls</code></td><td>List files and directories</td></tr>
+<tr><td><code>ls -l</code></td><td>Detailed / long listing</td></tr>
+<tr><td><code>ls -a</code></td><td>Show hidden files and directories</td></tr>
+<tr><td><code>ls -lh</code></td><td>Detailed listing + human-readable sizes</td></tr>
+<tr><td><code>ls -lt</code></td><td>Sort by modification time</td></tr>
+<tr><td><code>ls -lht</code></td><td>Detailed + human-readable + time sorting</td></tr>
+<tr><td><code>ls -la</code></td><td>Detailed listing + hidden files</td></tr>
+<tr><td><code>cd directory</code></td><td>Move into a directory</td></tr>
+<tr><td><code>cd ..</code></td><td>Move to parent directory</td></tr>
+<tr><td><code>cd /</code></td><td>Move to root directory</td></tr>
+<tr><td><code>cd ~</code></td><td>Move to current user's home directory</td></tr>
+<tr><td><code>mkdir</code></td><td>Create a new directory</td></tr>
+<tr><td><code>mkdir -p</code></td><td>Create nested directories with required parent directories</td></tr>
+</table>
+
+<h2>⭐ Key Concepts to Remember</h2>
+
+<div class="cheat">
+<div class="cheat-grid">
+<div class="cheat-item"><strong>.</strong> → Current directory</div>
+<div class="cheat-item"><strong>..</strong> → Parent directory</div>
+<div class="cheat-item"><strong>~</strong> → Current user's home</div>
+<div class="cheat-item"><strong>/</strong> → Root directory</div>
+<div class="cheat-item"><strong>-l</strong> → Long / detailed listing</div>
+<div class="cheat-item"><strong>-a</strong> → All, including hidden files</div>
+<div class="cheat-item"><strong>-h</strong> → Human-readable sizes</div>
+<div class="cheat-item"><strong>-t</strong> → Modification-time sorting</div>
+<div class="cheat-item"><strong>Absolute path</strong> → Starts at /</div>
+<div class="cheat-item"><strong>Relative path</strong> → Starts from current location</div>
+<div class="cheat-item"><strong>mkdir</strong> → Make Directory</div>
+<div class="cheat-item"><strong>mkdir -p</strong> → Create missing parent directories too</div>
+</div>
+</div>
+
+<details>
+<summary>☑ Self-Check — Test Yourself</summary>
+<div class="inside">
+<ul class="checklist">
+<li><input type="checkbox"> Can you explain what <code>pwd</code> tells you?</li>
+<li><input type="checkbox"> Can you explain <code>ls -l</code>?</li>
+<li><input type="checkbox"> Can you explain why <code>ls -a</code> shows <code>.bashrc</code>?</li>
+<li><input type="checkbox"> Can you explain <code>-h</code> and <code>-t</code>?</li>
+<li><input type="checkbox"> What does <code>cd ..</code> do?</li>
+<li><input type="checkbox"> What do <code>/</code> and <code>~</code> represent?</li>
+<li><input type="checkbox"> Can you distinguish absolute and relative paths?</li>
+<li><input type="checkbox"> When would you use <code>mkdir -p</code>?</li>
+</ul>
+</div>
+</details>
+
+<div class="callout green">
+<div class="ct">💡 Practice Rule</div>
+Do not only memorize the commands. <strong>Read the concept → type the command → observe the output.</strong>
+The practical terminal work is an important part of learning Linux.
+</div>
+</section>
+
+
+<section class="page">
+<span class="num">08</span>
+
+<h2 class="red">🎯 Important Interview Questions & Answers</h2>
+
+<div class="question">
+<b>Q1. What is the use of the <code>ls</code> command?</b>
+<div class="answer">
+<strong>Answer:</strong> <code>ls</code> is used to list the files and directories in the current directory.
+</div>
+</div>
+
+<div class="question">
+<b>Q2. What is the difference between <code>ls -l</code> and <code>ls -a</code>?</b>
+<div class="answer">
+<strong>Answer:</strong> <code>ls -l</code> gives a detailed listing, while <code>ls -a</code> also shows hidden files and directories.
+</div>
+</div>
+
+<div class="question">
+<b>Q3. What is the use of <code>ls -lh</code>?</b>
+<div class="answer">
+<strong>Answer:</strong> <code>-l</code> provides a detailed listing and <code>-h</code> displays file sizes in a human-readable format.
+</div>
+</div>
+
+<div class="question">
+<b>Q4. What does <code>ls -lt</code> do?</b>
+<div class="answer">
+<strong>Answer:</strong> It sorts files according to their modification time, generally showing recently modified files near the top.
+</div>
+</div>
+
+<div class="question">
+<b>Q5. What does <code>cd ..</code> do?</b>
+<div class="answer">
+<strong>Answer:</strong> It moves from the current directory to its parent directory.
+</div>
+</div>
+
+<div class="question">
+<b>Q6. What is the difference between an absolute path and a relative path?</b>
+<div class="answer">
+<strong>Answer:</strong> An <strong>absolute path</strong> starts from the root <code>/</code> and specifies the complete location.
+A <strong>relative path</strong> uses the current directory as its starting point.
+</div>
+</div>
+
+<div class="question">
+<b>Q7. What is the use of <code>mkdir -p</code>?</b>
+<div class="answer">
+<strong>Answer:</strong> <code>mkdir -p</code> creates the required parent directories as well, making it useful for creating nested directory structures.
+</div>
+</div>
+
+<h2>⚡ Last-Minute Revision — One-Page Cheat Sheet</h2>
+
+<div class="cheat">
+<div class="cheat-grid">
+<div class="cheat-item"><strong>pwd</strong> → Where am I?</div>
+<div class="cheat-item"><strong>ls</strong> → What is here?</div>
+<div class="cheat-item"><strong>ls -l</strong> → Detailed listing</div>
+<div class="cheat-item"><strong>ls -a</strong> → Hidden files too</div>
+<div class="cheat-item"><strong>ls -lh</strong> → Readable sizes</div>
+<div class="cheat-item"><strong>ls -lt</strong> → Sort by modification time</div>
+<div class="cheat-item"><strong>ls -lht</strong> → Detailed + readable + time sort</div>
+<div class="cheat-item"><strong>ls -la</strong> → Detailed + hidden</div>
+<div class="cheat-item"><strong>cd Documents</strong> → Enter Documents</div>
+<div class="cheat-item"><strong>cd ..</strong> → Go one level up</div>
+<div class="cheat-item"><strong>cd /</strong> → Go to root</div>
+<div class="cheat-item"><strong>cd ~</strong> → Go to home</div>
+<div class="cheat-item"><strong>mkdir name</strong> → Create directory</div>
+<div class="cheat-item"><strong>mkdir -p a/b/c</strong> → Create nested structure</div>
+<div class="cheat-item"><strong>.</strong> → Current directory</div>
+<div class="cheat-item"><strong>..</strong> → Parent directory</div>
+<div class="cheat-item"><strong>Absolute</strong> → Starts from /</div>
+<div class="cheat-item"><strong>Relative</strong> → Starts from current directory</div>
+</div>
+</div>
+
+<div class="callout yellow">
+<div class="ct">⭐ Interview Memory Line</div>
+<strong>ls = list → cd = change → mkdir = make.</strong><br>
+<strong>pwd = current location → . = here → .. = one level up → ~ = home → / = root.</strong>
+</div>
+
+<div class="callout red">
+<div class="ct">📌 Next Video</div>
+The next video will cover working with Linux files using
+<strong><code>touch</code>, <code>cp</code>, <code>mv</code> and <code>rm</code></strong>.
+</div>
+
+<div class="footer">
+Linux Series — Basic File Commands • Study → Type → Observe → Revise
+</div>
+</section>
+
+</div>
+</body>
+</html>
